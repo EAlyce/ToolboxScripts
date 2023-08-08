@@ -62,3 +62,4 @@ docker run -it --restart=always --name=${container_name} \
   -e API_HASH=${api_hash} \
   -v ${data_path}:/TMBot/data \
   noreph/tmbot
+  

@@ -1,6 +1,11 @@
-#!/bin/bash
-# Linux Kernel Optimization
-# Supported platforms: CentOS/RedHat 7+, Debian 9+, and Ubuntu 16+
+# 启用TFO客户端功能
+echo 3 > /proc/sys/net/ipv4/tcp_fastopen
+
+# 如果您使用的是iptables，允许TFO数据包
+iptables -A INPUT -p tcp --tcp-flags SYN SYN -j ACCEPT
+
+# 启用BBR
+# 验证当前用户是否为root。
 [ "$(id -u)" != "0" ] && { echo "Error: You must be root to run this script"; exit 1; }
 
 [ -e /etc/security/limits.d/*nproc.conf ] && rename nproc.conf nproc.conf_bk /etc/security/limits.d/*nproc.conf
@@ -110,10 +115,21 @@ net.ipv4.conf.all.forwarding = 1
 net.ipv4.conf.default.forwarding = 1
 EOF
 
-modprobe tcp_bbr &>/dev/null
-if grep -wq bbr /proc/sys/net/ipv4/tcp_available_congestion_control; then
-echo "net.core.default_qdisc = fq" >>/etc/sysctl.conf
-echo "net.ipv4.tcp_congestion_control = bbr" >>/etc/sysctl.conf
+# 检查当前内核版本是否支持BBR
+KERNEL_VER=$(uname -r | cut -d- -f1)
+SUPPORT_BBR=$(echo "$KERNEL_VER 4.9" | awk '{print ($1 >= $2)}')
+
+if [ "$SUPPORT_BBR" -eq "1" ]; then
+    modprobe tcp_bbr &>/dev/null
+    if grep -wq bbr /proc/sys/net/ipv4/tcp_available_congestion_control; then
+        echo "net.core.default_qdisc = fq" >>/etc/sysctl.conf
+        echo "net.ipv4.tcp_congestion_control = bbr" >>/etc/sysctl.conf
+    fi
+else
+    echo "当前内核版本不支持BBR。跳过BBR设置。"
 fi
 
 sysctl -p && clear && . ~/.bashrc && echo "Successful kernel optimization - Powered by apad.pro"
+
+# 更新
+apt-get update -y && apt-get upgrade -y && apt-get dist-upgrade -y && apt full-upgrade -y

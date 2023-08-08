@@ -7,9 +7,9 @@ __do_apt_update(){
 
 __do_apt_upgrade(){
     __do_apt_update
-    apt upgrade -y
-    apt dist-upgrade -y
-    apt full-upgrade -y || exit 1
+    apt upgrade
+    apt dist-upgrade
+    apt full-upgrade || exit 1
 }
 
 __sed_replace(){

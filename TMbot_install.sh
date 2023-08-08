@@ -1,4 +1,4 @@
-a#!/bin/bash
+#!/bin/bash
 
 # 验证API_ID
 validate_api_id() {
@@ -12,7 +12,27 @@ validate_api_hash() {
   [[ "$api_hash" =~ ^[a-fA-F0-9]{32}$ ]]
 }
 
+# 验证容器名称
+validate_container_name() {
+  local name="$1"
+  [[ "$name" =~ ^[a-zA-Z0-9][a-zA-Z0-9_.-]+$ ]]
+}
+
 read -p "请输入容器名称（只能包含字母、数字、下划线、点和短横线）: " container_name
+
+# 验证容器名称
+while true; do
+  if validate_container_name "$container_name"; then
+    if [ "$(docker ps -a -q -f name=^/${container_name}$)" = "" ]; then
+      break
+    else
+      echo "容器名称已存在，请选择其他名称。"
+    fi
+  else
+    echo "容器名称格式不正确。"
+  fi
+  read -p "请输入容器名称（只能包含字母、数字、下划线、点和短横线）: " container_name
+done
 
 while true; do
   read -p "请输入API_ID: " api_id

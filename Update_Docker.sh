@@ -12,7 +12,7 @@ do
   docker exec -it $container_id apt-get update
   
   # 升级容器内的所有包
-  docker exec -it $container_id apt-get upgrade -y
+  docker exec -it $container_id apt-get update -y && apt-get upgrade -y && apt-get dist-upgrade -y && apt full-upgrade -y
   
   echo "容器 $container_id 更新完成！"
 done

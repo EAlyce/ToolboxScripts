@@ -32,7 +32,7 @@ validate_api_hash() {
 # 验证容器名称
 validate_container_name() {
   local name="$1"
-  [[ "$name" =~ ^[a-zA-Z0-9][a-zA-Z0-9_.-]+$ ]]
+  [[ "$name" =~ ^[a-zA-Z0-9][a-zA-Z0-9_.-]+$ ]] && [ ! -d "/$name" ]
 }
 
 read -p "请输入容器名称（只能包含字母、数字、下划线、点和短横线）: " container_name
@@ -46,7 +46,7 @@ while true; do
       echo "容器名称已存在，请选择其他名称。"
     fi
   else
-    echo "容器名称格式不正确。"
+    echo "容器名称格式不正确或与系统文件夹同名。"
   fi
   read -p "请输入容器名称（只能包含字母、数字、下划线、点和短横线）: " container_name
 done

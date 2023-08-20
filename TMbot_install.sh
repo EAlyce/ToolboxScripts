@@ -1,5 +1,22 @@
 #!/bin/bash
 
+# 检测是否安装了Docker
+if ! command -v docker &> /dev/null; then
+  echo "Docker未安装，正在自动安装..."
+  sudo apt-get update
+  sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
+  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+  sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+  sudo apt-get update
+  sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+  echo "Docker已成功安装。"
+fi
+
+# 更新Docker内所有包
+echo "正在更新Docker内所有包..."
+sudo docker system prune -a -f
+sudo docker images | awk '(NR>1) && ($2!="<none>") {print $1":"$2}' | xargs -L1 docker pull
+
 # 验证API_ID
 validate_api_id() {
   local api_id="$1"
@@ -62,4 +79,5 @@ docker run -it --restart=always --name=${container_name} \
   -e API_HASH=${api_hash} \
   -v ${data_path}:/TMBot/data \
   noreph/tmbot
+  
   

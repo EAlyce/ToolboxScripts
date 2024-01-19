@@ -63,7 +63,7 @@ net.ipv4.tcp_synack_retries = 1
 net.ipv4.tcp_timestamps = 0
 net.ipv4.tcp_max_orphans = 131072
 net.ipv4.tcp_no_metrics_save = 1
-net.ipv4.tcp_ecn = 0
+net.ipv4.tcp_ecn = 1
 net.ipv4.tcp_frto = 0
 net.ipv4.tcp_mtu_probing = 0
 net.ipv4.tcp_rfc1337 = 0
@@ -80,6 +80,27 @@ net.ipv4.conf.all.forwarding = 0
 net.ipv4.conf.default.forwarding = 0
 net.core.default_qdisc = fq_codel
 net.ipv4.tcp_congestion_control = bbr
+
+#SSR 对于会出现突发空闲的长周期 TLS 连接有很大影响，所以关闭
+net.ipv4.tcp_slow_start_after_idle = 0
+
+#设置为1，当检测到 ICMP 黑洞时启用
+net.ipv4.tcp_mtu_probing = 1
+
+#Socket缓存配置
+net.ipv4.tcp_rmem = 8192 262144 536870912
+net.ipv4.tcp_wmem = 4096 16384 536870912
+
+#TCP窗口大小，接收缓冲区可用buffer
+net.ipv4.tcp_adv_win_scale = -2
+
+#限制写入队列中未发送字节的大小
+net.ipv4.tcp_notsent_lowat = 131072
+
+#关闭IPv6
+net.ipv6.conf.all.disable_ipv6 = 1
+net.ipv6.conf.default.disable_ipv6 = 1
+net.ipv6.conf.lo.disable_ipv6 = 1
 EOF
 }
 
